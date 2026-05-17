@@ -1,0 +1,193 @@
+// This is your Prisma schema file
+// SQLite version for zero-setup local demo
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   // EMPLOYEE | MANAGER | ADMIN
+  department String?
+  managerId  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  manager        User?          @relation("ManagerEmployees", fields: [managerId], references: [id])
+  directReports  User[]         @relation("ManagerEmployees")
+  goals          Goal[]         @relation("EmployeeGoals")
+  checkinsGiven  CheckIn[]      @relation("ManagerCheckIns")
+  auditLogs      AuditLog[]     @relation("UserAuditLogs")
+  escalations    Escalation[]   @relation("EscalatedUser")
+  notifications  Notification[]
+  comments       Comment[]
+  sharedGoals    SharedGoal[]   @relation("SharedGoalRecipient")
+
+  @@map("users")
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  employeeId  String
+  thrustArea  String
+  title       String
+  description String?
+  uom         String   // NUMERIC_HIGHER | NUMERIC_LOWER | TIMELINE | ZERO_BASED
+  target      Float
+  weightage   Float
+  status      String   @default("DRAFT") // DRAFT | SUBMITTED | APPROVED | RETURNED | LOCKED
+  isLocked    Boolean  @default(false)
+  isShared    Boolean  @default(false)
+  deadline    DateTime?
+  year        Int      @default(2026)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employee     User          @relation("EmployeeGoals", fields: [employeeId], references: [id])
+  achievements Achievement[]
+  checkIns     CheckIn[]
+  auditLogs    AuditLog[]    @relation("GoalAuditLogs")
+  comments     Comment[]
+  sharedGoals  SharedGoal[]
+
+  @@map("goals")
+}
+
+model Achievement {
+  id            String   @id @default(uuid())
+  goalId        String
+  quarter       String   // Q1 | Q2 | Q3 | Q4
+  actualValue   Float?
+  status        String   @default("NOT_STARTED") // NOT_STARTED | ON_TRACK | COMPLETED
+  computedScore Float?
+  notes         String?
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([goalId, quarter])
+  @@map("achievements")
+}
+
+model CheckIn {
+  id        String   @id @default(uuid())
+  goalId    String
+  managerId String
+  quarter   String   // Q1 | Q2 | Q3 | Q4
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  goal    Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  manager User @relation("ManagerCheckIns", fields: [managerId], references: [id])
+
+  @@unique([goalId, quarter, managerId])
+  @@map("checkins")
+}
+
+model AuditLog {
+  id                String   @id @default(uuid())
+  entityType        String
+  entityId          String
+  changedById       String
+  changeDescription String
+  oldValue          String?
+  newValue          String?
+  changedAt         DateTime @default(now())
+
+  changedBy User  @relation("UserAuditLogs", fields: [changedById], references: [id])
+  goal      Goal? @relation("GoalAuditLogs", fields: [entityId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Escalation {
+  id               String    @id @default(uuid())
+  ruleType         String
+  triggeredForId   String
+  status           String    @default("PENDING") // PENDING | RESOLVED
+  message          String
+  triggeredAt      DateTime  @default(now())
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+
+  triggeredFor User @relation("EscalatedUser", fields: [triggeredForId], references: [id])
+
+  @@map("escalations")
+}
+
+model Cycle {
+  id        String   @id @default(uuid())
+  phaseName String   // GOAL_SETTING | Q1_CHECKIN | Q2_CHECKIN | Q3_CHECKIN | Q4_ANNUAL
+  label     String
+  opensAt   DateTime
+  closesAt  DateTime
+  isActive  Boolean  @default(false)
+  year      Int      @default(2026)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cycles")
+}
+
+model SharedGoal {
+  id              String   @id @default(uuid())
+  goalId          String
+  recipientId     String
+  customWeightage Float
+  createdAt       DateTime @default(now())
+
+  goal      Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  recipient User @relation("SharedGoalRecipient", fields: [recipientId], references: [id])
+
+  @@unique([goalId, recipientId])
+  @@map("shared_goals")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  message   String
+  type      String   @default("GENERAL") // GOAL_SUBMITTED | GOAL_APPROVED | GOAL_RETURNED | CHECKIN_REMINDER | ESCALATION | NUDGE | SHARED_GOAL | GENERAL
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  goalId    String
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("comments")
+}
+
+model EscalationRule {
+  id            String   @id @default(uuid())
+  ruleType      String   @unique
+  daysThreshold Int
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("escalation_rules")
+}

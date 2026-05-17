@@ -1,0 +1,87 @@
+# =========================
+# Node / npm
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =========================
+# Build output
+# =========================
+dist/
+build/
+out/
+
+# =========================
+# Environment variables — NEVER commit real secrets
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Database — SQLite files (local dev only)
+# =========================
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# =========================
+# Prisma generated client (regenerated on install)
+# =========================
+# Keep schema & migrations, exclude generated client binary
+# node_modules/@prisma is already covered above
+
+# =========================
+# TypeScript
+# =========================
+*.tsbuildinfo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =========================
+# Editors / IDEs
+# =========================
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Docker
+# =========================
+# Keep docker-compose.yml but ignore override files
+docker-compose.override.yml
+
+# =========================
+# Vite / frontend cache
+# =========================
+.vite/
+frontend/.vite/

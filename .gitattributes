@@ -1,0 +1,11 @@
+# Normalize line endings to LF on commit, convert to CRLF on Windows checkout
+* text=auto eol=lf
+
+# Explicitly set binaries
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.db-journal binary
