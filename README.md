@@ -443,15 +443,6 @@ docker-compose up --build -d
 
 ---
 
-## Team
-
-| Name | Role |
-|---|---|
-| Your Name | Full Stack Development |
-| Team Member 2 | Frontend and UI/UX |
-| Team Member 3 | Backend and Database |
-
----
 
 <div align="center">
 
