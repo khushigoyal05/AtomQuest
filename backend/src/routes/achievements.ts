@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PrismaClient, AchievementStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { computeScore } from '../services/scoring';
 import { sendNudgeIfAtRisk } from '../services/escalation';
@@ -22,8 +22,8 @@ router.post('/', authenticate, requireRole('EMPLOYEE'), async (req: AuthRequest,
 
     const achievement = await prisma.achievement.upsert({
       where: { goalId_quarter: { goalId, quarter } },
-      update: { actualValue: actualValue !== undefined ? parseFloat(actualValue) : undefined, status: status as AchievementStatus, notes, computedScore },
-      create: { goalId, quarter, actualValue: actualValue !== undefined ? parseFloat(actualValue) : undefined, status: (status as AchievementStatus) || 'NOT_STARTED', notes, computedScore },
+      update: { actualValue: actualValue !== undefined ? parseFloat(actualValue) : undefined, status: status as string, notes, computedScore },
+      create: { goalId, quarter, actualValue: actualValue !== undefined ? parseFloat(actualValue) : undefined, status: (status as string) || 'NOT_STARTED', notes, computedScore },
     });
 
     // Check for At-Risk

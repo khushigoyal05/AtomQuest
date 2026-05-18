@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PrismaClient, GoalStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { computeScore } from '../services/scoring';
 import { sendEmail } from '../services/email';
@@ -119,7 +119,7 @@ router.post('/submit', authenticate, requireRole('EMPLOYEE'), async (req: AuthRe
       return res.status(400).json({ error: `Total weightage must be 100% (currently ${totalWeightage.toFixed(1)}%)` });
     }
 
-    await prisma.goal.updateMany({ where: { employeeId: req.user!.id, status: { in: ['DRAFT', 'RETURNED'] } }, data: { status: GoalStatus.SUBMITTED } });
+    await prisma.goal.updateMany({ where: { employeeId: req.user!.id, status: { in: ['DRAFT', 'RETURNED'] } }, data: { status: 'SUBMITTED' } });
 
     // Notify manager
     const employee = await prisma.user.findUnique({ where: { id: req.user!.id }, include: { manager: true } });
@@ -142,7 +142,7 @@ router.post('/:id/approve', authenticate, requireRole('MANAGER', 'ADMIN'), async
     const goal = await prisma.goal.findUnique({ where: { id: req.params.id }, include: { employee: true } });
     if (!goal) return res.status(404).json({ error: 'Goal not found' });
 
-    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { status: GoalStatus.APPROVED, isLocked: true } });
+    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { status: 'APPROVED', isLocked: true } });
     await prisma.notification.create({ data: { userId: goal.employeeId, message: `Your goal "${goal.title}" has been approved.`, type: 'GOAL_APPROVED' } });
     await sendEmail({ to: goal.employee.email, subject: 'Goal Approved', html: `<p>Your goal <strong>"${goal.title}"</strong> has been approved and is now locked.</p>` });
     await createAuditLog({ entityType: 'goal', entityId: goal.id, changedById: req.user!.id, changeDescription: 'Goal approved by manager', oldValue: goal.status, newValue: 'APPROVED' });
@@ -161,7 +161,7 @@ router.post('/:id/return', authenticate, requireRole('MANAGER', 'ADMIN'), async 
     const goal = await prisma.goal.findUnique({ where: { id: req.params.id }, include: { employee: true } });
     if (!goal) return res.status(404).json({ error: 'Goal not found' });
 
-    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { status: GoalStatus.RETURNED, isLocked: false } });
+    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { status: 'RETURNED', isLocked: false } });
     await prisma.notification.create({ data: { userId: goal.employeeId, message: `Your goal "${goal.title}" was returned for rework. Reason: ${reason}`, type: 'GOAL_RETURNED' } });
     await sendEmail({ to: goal.employee.email, subject: 'Goal Returned for Rework', html: `<p>Your goal <strong>"${goal.title}"</strong> has been returned for rework.</p><p><strong>Reason:</strong> ${reason}</p>` });
     await createAuditLog({ entityType: 'goal', entityId: goal.id, changedById: req.user!.id, changeDescription: `Goal returned for rework. Reason: ${reason}`, oldValue: goal.status, newValue: 'RETURNED' });
@@ -178,7 +178,7 @@ router.post('/:id/unlock', authenticate, requireRole('ADMIN'), async (req: AuthR
     if (!reason) return res.status(400).json({ error: 'Unlock reason is required' });
     const goal = await prisma.goal.findUnique({ where: { id: req.params.id } });
     if (!goal) return res.status(404).json({ error: 'Goal not found' });
-    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { isLocked: false, status: GoalStatus.RETURNED } });
+    const updated = await prisma.goal.update({ where: { id: req.params.id }, data: { isLocked: false, status: 'RETURNED' } });
     await createAuditLog({ entityType: 'goal', entityId: goal.id, changedById: req.user!.id, changeDescription: `Goal unlocked by admin. Reason: ${reason}`, oldValue: 'LOCKED', newValue: 'UNLOCKED' });
     res.json(updated);
   } catch {

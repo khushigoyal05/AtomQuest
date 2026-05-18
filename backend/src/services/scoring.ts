@@ -1,4 +1,8 @@
-import { UoMType } from '@prisma/client';
+type UoMType =
+  | 'NUMERIC_HIGHER'
+  | 'NUMERIC_LOWER'
+  | 'TIMELINE'
+  | 'ZERO_BASED';
 
 /**
  * Compute score for a goal based on UoM type.
