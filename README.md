@@ -6,7 +6,7 @@
 
 **A full-stack, enterprise-grade web portal for managing the complete lifecycle of employee goals — from creation and approval to quarterly check-ins and performance reporting.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portal-6366f1?style=for-the-badge)](https://your-live-link-here.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portal-6366f1?style=for-the-badge)](https://atomquest-theta-seven.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-khushigoyal05%2FAtomQuest-181717?style=for-the-badge&logo=github)](https://github.com/khushigoyal05/AtomQuest)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 
@@ -457,6 +457,6 @@ docker-compose up --build -d
 
 Built for **AtomQuest Hackathon 1.0**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portal-6366f1?style=for-the-badge)](https://your-live-link-here.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portal-6366f1?style=for-the-badge)](https://atomquest-theta-seven.vercel.app)
 
 </div>
