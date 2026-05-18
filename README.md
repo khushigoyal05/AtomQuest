@@ -416,13 +416,13 @@ VITE_API_URL=http://localhost:4000/api
 
 ## Deployment
 
-### Backend — Railway
+### Backend — Render
 
 1. Push the repository to GitHub
-2. Create a new Railway project and connect the repository
+2. Create a new Render project and connect the repository
 3. Set the root directory to `portal/backend`
-4. Add the required environment variables in the Railway dashboard
-5. Railway auto-deploys on every push to main
+4. Add the required environment variables in the Render dashboard
+5. Render auto-deploys on every push to main
 
 ### Frontend — Vercel
 
@@ -431,7 +431,7 @@ cd frontend
 vercel deploy --prod
 ```
 
-Set `VITE_API_URL` to the deployed Railway backend URL in the Vercel project environment settings.
+Set `VITE_API_URL` to the deployed Render backend URL in the Vercel project environment settings.
 
 ### Full Stack — Docker Compose
 
